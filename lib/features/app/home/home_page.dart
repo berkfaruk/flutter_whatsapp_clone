@@ -1,0 +1,148 @@
+import 'package:flutter/material.dart';
+import 'package:whatsapp_clone_app/features/app/home/contacts_page.dart';
+import 'package:whatsapp_clone_app/features/app/theme/style.dart';
+import 'package:whatsapp_clone_app/features/call/presentation/pages/calls_history_page.dart';
+import 'package:whatsapp_clone_app/features/chat/presentation/pages/chat_page.dart';
+import 'package:whatsapp_clone_app/features/status/presentation/pages/status_page.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
+  TabController? _tabController;
+  int _currentTabIndex = 0;
+
+  @override
+  void initState() {
+    _tabController = TabController(length: 3, vsync: this);
+
+    _tabController!.addListener(() {
+      setState(() {
+        _currentTabIndex = _tabController!.index;
+      });
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _tabController!.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          "WhatsApp",
+          style: TextStyle(
+              fontSize: 20, color: greyColor, fontWeight: FontWeight.w600),
+        ),
+        actions: const [
+          Row(
+            children: [
+              Icon(Icons.camera_alt_outlined, color: greyColor, size: 28),
+              SizedBox(width: 25),
+              Icon(Icons.search, color: greyColor, size: 28),
+              SizedBox(width: 25),
+              Icon(Icons.more_vert, color: greyColor, size: 28),
+            ],
+          ),
+        ],
+        bottom: TabBar(
+          indicatorColor: tabColor,
+          labelColor: tabColor,
+          unselectedLabelColor: greyColor,
+          controller: _tabController,
+          tabs: const [
+            Tab(
+              child: Text(
+                "Chats",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "Status",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+            Tab(
+              child: Text(
+                "Calls",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton:
+          switchFloatingActionButtonOnTabIndex(_currentTabIndex),
+      body: TabBarView(controller: _tabController, children: const [
+        ChatPage(),
+        StatusPage(),
+        CallsHistoryPage(),
+      ]),
+    );
+  }
+
+  switchFloatingActionButtonOnTabIndex(int index) {
+    switch (index) {
+      case 0:
+        {
+          return FloatingActionButton(
+            backgroundColor: tabColor,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const ContactsPage()));
+            },
+            child: const Icon(
+              Icons.message,
+              color: Colors.white,
+            ),
+          );
+        }
+      case 1:
+        {
+          return FloatingActionButton(
+            backgroundColor: tabColor,
+            onPressed: () {},
+            child: const Icon(
+              Icons.camera_alt,
+              color: Colors.white,
+            ),
+          );
+        }
+      case 2:
+        {
+          return FloatingActionButton(
+            backgroundColor: tabColor,
+            onPressed: () {},
+            child: const Icon(
+              Icons.add_call,
+              color: Colors.white,
+            ),
+          );
+        }
+      default:
+        {
+          return FloatingActionButton(
+            backgroundColor: tabColor,
+            onPressed: () {},
+            child: const Icon(
+              Icons.message,
+              color: Colors.white,
+            ),
+          );
+        }
+    }
+  }
+}

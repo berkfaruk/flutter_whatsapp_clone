@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:whatsapp_clone_app/features/app/const/app_const.dart';
 import 'package:whatsapp_clone_app/features/app/global/widgets/profile_widget.dart';
+import 'package:whatsapp_clone_app/features/app/home/home_page.dart';
 import 'package:whatsapp_clone_app/features/app/theme/style.dart';
 
 class InitialProfileSubmitPage extends StatefulWidget {
@@ -82,7 +83,12 @@ class _InitialProfileSubmitPageState extends State<InitialProfileSubmitPage> {
             ),
             const SizedBox(height: 20),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomePage()),
+                    (route) => false);
+              },
               child: Container(
                 width: 150,
                 height: 40,
