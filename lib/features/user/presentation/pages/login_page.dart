@@ -2,7 +2,7 @@ import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_pickers.dart';
 import 'package:flutter/material.dart';
 import 'package:whatsapp_clone_app/features/app/theme/style.dart';
-import 'package:whatsapp_clone_app/user/presentation/pages/otp_page.dart';
+import 'package:whatsapp_clone_app/features/user/presentation/pages/otp_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
