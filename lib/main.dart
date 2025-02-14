@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:whatsapp_clone_app/features/app/splash/splash_screen.dart';
 import 'package:whatsapp_clone_app/features/app/theme/style.dart';
 import 'package:whatsapp_clone_app/routes/on_generate_routes.dart';
+import 'main_injection_container.dart' as di;
 
-void main() {
+void main() async {
+  await di.init();
   runApp(const MyApp());
 }
 
