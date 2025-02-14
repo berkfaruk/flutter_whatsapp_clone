@@ -8,5 +8,5 @@ class ContactEntity {
   final Uint8List? userProfile;
 
   ContactEntity(
-      this.phoneNumber, this.label, this.uid, this.status, this.userProfile);
+      {this.phoneNumber, this.label, this.uid, this.status, this.userProfile});
 }
