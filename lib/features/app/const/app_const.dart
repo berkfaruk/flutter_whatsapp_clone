@@ -17,8 +17,7 @@ void toast(String message) {
 Future<GiphyGif?> pickGIF(BuildContext context) async {
   GiphyGif? gif;
   try {
-    gif = await GiphyPicker.pickGif(
-        context: context, apiKey: 'QuwfWpi1lMUALN9YKODRPuIPzjLFyt2S');
+    gif = await GiphyPicker.pickGif(context: context, apiKey: '');
   } catch (e) {
     toast(e.toString());
   }
