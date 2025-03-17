@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_clone_app/features/app/const/page_const.dart';
 import 'package:whatsapp_clone_app/features/app/theme/style.dart';
 import 'package:whatsapp_clone_app/features/call/presentation/pages/calls_history_page.dart';
 import 'package:whatsapp_clone_app/features/chat/presentation/pages/chat_page.dart';
 import 'package:whatsapp_clone_app/features/status/presentation/pages/status_page.dart';
+import 'package:whatsapp_clone_app/features/user/domain/entities/user_entity.dart';
+import 'package:whatsapp_clone_app/features/user/presentation/cubit/user/user_cubit.dart';
 
 class HomePage extends StatefulWidget {
   final String uid;
@@ -14,12 +17,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, WidgetsBindingObserver {
   TabController? _tabController;
   int _currentTabIndex = 0;
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 3, vsync: this);
 
     _tabController!.addListener(() {
@@ -32,8 +36,34 @@ class _HomePageState extends State<HomePage>
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _tabController!.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        BlocProvider.of<UserCubit>(context).updateUser(
+          user: UserEntity(uid: widget.uid, isOnline: true),
+        );
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.paused:
+        BlocProvider.of<UserCubit>(context).updateUser(
+          user: UserEntity(
+            uid: widget.uid,
+            isOnline: false,
+          ),
+        );
+        break;
+      case AppLifecycleState.hidden:
+        //TODO: Handle this case.
+        break;
+    }
   }
 
   @override
@@ -65,7 +95,8 @@ class _HomePageState extends State<HomePage>
                     value: "Settings",
                     child: GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, PageConst.settingsPage, arguments: widget.uid);
+                          Navigator.pushNamed(context, PageConst.settingsPage,
+                              arguments: widget.uid);
                         },
                         child: const Text('Settings')),
                   ),
@@ -103,10 +134,10 @@ class _HomePageState extends State<HomePage>
       ),
       floatingActionButton:
           switchFloatingActionButtonOnTabIndex(_currentTabIndex),
-      body: TabBarView(controller: _tabController, children: const [
-        ChatPage(),
-        StatusPage(),
-        CallsHistoryPage(),
+      body: TabBarView(controller: _tabController, children: [
+        ChatPage(uid: widget.uid),
+        const StatusPage(),
+        const CallsHistoryPage(),
       ]),
     );
   }
@@ -119,7 +150,8 @@ class _HomePageState extends State<HomePage>
             backgroundColor: tabColor,
             onPressed: () {
               //Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactsPage()));
-              Navigator.pushNamed(context, PageConst.contactUsersPage);
+              Navigator.pushNamed(context, PageConst.contactUsersPage,
+                  arguments: widget.uid);
             },
             child: const Icon(
               Icons.message,

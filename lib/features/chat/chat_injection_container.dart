@@ -6,6 +6,7 @@ import 'package:whatsapp_clone_app/features/chat/domain/usecases/delete_message_
 import 'package:whatsapp_clone_app/features/chat/domain/usecases/delete_my_chat_usecase.dart';
 import 'package:whatsapp_clone_app/features/chat/domain/usecases/get_messages_usecase.dart';
 import 'package:whatsapp_clone_app/features/chat/domain/usecases/get_my_chat_usecase.dart';
+import 'package:whatsapp_clone_app/features/chat/domain/usecases/seen_message_update_usecase.dart';
 import 'package:whatsapp_clone_app/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:whatsapp_clone_app/features/chat/presentation/cubit/chat/chat_cubit.dart';
 import 'package:whatsapp_clone_app/features/chat/presentation/cubit/message/message_cubit.dart';
@@ -23,6 +24,7 @@ Future<void> chatInjectionContainer() async {
         getMessagesUseCase: sl.call(),
         sendMessageUseCase: sl.call(),
         deleteMessageUseCase: sl.call(),
+        seenMessageUpdateUseCase: sl.call(),
       ));
 
   // USE CASES INJECTION
@@ -41,6 +43,9 @@ Future<void> chatInjectionContainer() async {
 
   sl.registerLazySingleton<SendMessageUseCase>(
       () => SendMessageUseCase(repository: sl.call()));
+
+  sl.registerLazySingleton<SeenMessageUpdateUseCase>(
+      () => SeenMessageUpdateUseCase(repository: sl.call()));
 
   // REPOSITORY & DATA SOURCES INJECTION
 

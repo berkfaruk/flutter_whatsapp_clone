@@ -3,6 +3,7 @@ import 'package:whatsapp_clone_app/features/app/const/page_const.dart';
 import 'package:whatsapp_clone_app/features/app/home/contacts_page.dart';
 import 'package:whatsapp_clone_app/features/app/settings/settings_page.dart';
 import 'package:whatsapp_clone_app/features/call/presentation/pages/call_contacts_page.dart';
+import 'package:whatsapp_clone_app/features/chat/domain/entities/message_entity.dart';
 import 'package:whatsapp_clone_app/features/chat/presentation/pages/single_chat_page.dart';
 import 'package:whatsapp_clone_app/features/status/presentation/pages/my_status_page.dart';
 import 'package:whatsapp_clone_app/features/user/domain/entities/user_entity.dart';
@@ -16,11 +17,15 @@ class OnGenerateRoutes {
     switch (name) {
       case PageConst.contactUsersPage:
         {
-          return materialPageBuilder(const ContactsPage());
+          if (args is String) {
+            return materialPageBuilder(ContactsPage(uid: args));
+          } else {
+            return materialPageBuilder(const ErrorPage());
+          }
         }
       case PageConst.settingsPage:
         {
-          if(args is String) {
+          if (args is String) {
             return materialPageBuilder(SettingsPage(uid: args));
           } else {
             return materialPageBuilder(const ErrorPage());
@@ -28,7 +33,7 @@ class OnGenerateRoutes {
         }
       case PageConst.editProfilePage:
         {
-          if(args is UserEntity) {
+          if (args is UserEntity) {
             return materialPageBuilder(EditProfilePage(currentUser: args));
           } else {
             return materialPageBuilder(const ErrorPage());
@@ -44,7 +49,11 @@ class OnGenerateRoutes {
         }
       case PageConst.singleChatPage:
         {
-          return materialPageBuilder(const SingleChatPage());
+          if (args is MessageEntity) {
+            return materialPageBuilder(SingleChatPage(message: args));
+          } else {
+            return materialPageBuilder(const ErrorPage());
+          }
         }
     }
   }
@@ -56,11 +65,13 @@ dynamic materialPageBuilder(Widget child) {
 
 class ErrorPage extends StatelessWidget {
   const ErrorPage({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Error"),),
+      appBar: AppBar(
+        title: const Text("Error"),
+      ),
       body: const Center(
         child: Text("Error"),
       ),

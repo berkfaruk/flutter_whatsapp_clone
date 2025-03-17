@@ -6,5 +6,6 @@ abstract class ChatRemoteDataSource {
   Stream<List<ChatEntity>> getMyChat(ChatEntity chat);
   Stream<List<MessageEntity>> getMessages(MessageEntity message);
   Future<void> deleteMessage(MessageEntity message);
+  Future<void> seenMessageUpdate(MessageEntity message);
   Future<void> deleteChat(ChatEntity chat);
 }

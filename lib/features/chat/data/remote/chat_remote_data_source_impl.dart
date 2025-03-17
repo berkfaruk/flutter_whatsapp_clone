@@ -204,4 +204,26 @@ class ChatRemoteDataSourceImpl implements ChatRemoteDataSource {
     return myChatRef.snapshots().map((querySnapshot) =>
         querySnapshot.docs.map((e) => ChatModel.fromSnapshot(e)).toList());
   }
+
+  @override
+  Future<void> seenMessageUpdate(MessageEntity message) async {
+    final myMessagesRef = fireStore
+        .collection(FirebaseCollectionConst.users)
+        .doc(message.senderUid)
+        .collection(FirebaseCollectionConst.myChat)
+        .doc(message.recipientUid)
+        .collection(FirebaseCollectionConst.messages)
+        .doc(message.messageId);
+
+    final otherMessagesRef = fireStore
+        .collection(FirebaseCollectionConst.users)
+        .doc(message.recipientUid)
+        .collection(FirebaseCollectionConst.myChat)
+        .doc(message.senderUid)
+        .collection(FirebaseCollectionConst.messages)
+        .doc(message.messageId);
+
+    await myMessagesRef.update({"isSeen": true});
+    await otherMessagesRef.update({"isSeen": true});
+  }
 }
