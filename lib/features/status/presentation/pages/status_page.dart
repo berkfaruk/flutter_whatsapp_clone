@@ -25,8 +25,8 @@ import 'package:whatsapp_clone_app/main_injection_container.dart' as di;
 import 'package:whatsapp_clone_app/storage/storage_provider.dart';
 
 class StatusPage extends StatefulWidget {
-  final String uid;
-  const StatusPage({super.key, required this.uid});
+  final UserEntity currentUser;
+  const StatusPage({super.key, required this.currentUser});
 
   @override
   State<StatusPage> createState() => _StatusPageState();
@@ -82,14 +82,19 @@ class _StatusPageState extends State<StatusPage> {
   void initState() {
     super.initState();
     BlocProvider.of<StatusCubit>(context).getStatuses(status: StatusEntity());
-    BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
 
-    BlocProvider.of<GetMyStatusCubit>(context).getMyStatus(uid: widget.uid);
+    BlocProvider.of<GetMyStatusCubit>(context)
+        .getMyStatus(uid: widget.currentUser.uid!);
 
-    di.sl<GetMyStatusFutureUseCase>().call(widget.uid).then((myStatus) {
-      if (myStatus.isNotEmpty && myStatus.first.stories != null) {
-        _fillMyStoriesList(myStatus.first);
-      }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      di
+          .sl<GetMyStatusFutureUseCase>()
+          .call(widget.currentUser.uid!)
+          .then((myStatus) {
+        if (myStatus.isNotEmpty && myStatus.first.stories != null) {
+          _fillMyStoriesList(myStatus.first);
+        }
+      });
     });
   }
 
@@ -108,41 +113,28 @@ class _StatusPageState extends State<StatusPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<GetSingleUserCubit, GetSingleUserState>(
+    return BlocBuilder<StatusCubit, StatusState>(
       builder: (context, state) {
-        if (state is GetSingleUserLoaded) {
-          final currentUser = state.singleUser;
-          return BlocBuilder<StatusCubit, StatusState>(
-              builder: (context, state) {
-            if (state is StatusLoaded) {
-              final statuses = state.statuses
-                  .where((element) => element.uid != widget.uid)
-                  .toList();
-
-              if (_stories.isEmpty) {
-                return _bodyWidget(statuses, currentUser);
-              } else {
-                return BlocBuilder<GetMyStatusCubit, GetMyStatusState>(
-                    builder: (context, state) {
-                  if (state is GetMyStatusLoaded) {
-                    return _bodyWidget(statuses, currentUser,
-                        myStatus: state.myStatus);
-                  }
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: tabColor,
-                    ),
-                  );
-                });
+        if (state is StatusLoaded) {
+          final statuses = state.statuses
+              .where((element) => element.uid != widget.currentUser.uid)
+              .toList();
+          return BlocBuilder<GetMyStatusCubit, GetMyStatusState>(
+            builder: (context, state) {
+              if (state is GetMyStatusLoaded) {
+                return _bodyWidget(statuses, widget.currentUser,
+                    myStatus: state.myStatus);
               }
-            }
-            return const Center(
-              child: CircularProgressIndicator(
-                color: tabColor,
-              ),
-            );
-          });
+
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: tabColor,
+                ),
+              );
+            },
+          );
         }
+
         return const Center(
           child: CircularProgressIndicator(
             color: tabColor,
@@ -178,7 +170,7 @@ class _StatusPageState extends State<StatusPage> {
                                     isMe: true,
                                     spaceLength: 4,
                                     images: myStatus.stories!,
-                                    uid: widget.uid),
+                                    uid: widget.currentUser.uid),
                                 child: Container(
                                   margin: const EdgeInsets.all(3),
                                   width: 55,
@@ -257,7 +249,7 @@ class _StatusPageState extends State<StatusPage> {
                           arguments: myStatus);
                     },
                     child: Icon(Icons.more_horiz,
-                        color: greyColor.withOpacity(.5))),
+                        color: greyColor.withValues(alpha: .5))),
                 const SizedBox(width: 10),
               ],
             ),
@@ -301,7 +293,7 @@ class _StatusPageState extends State<StatusPage> {
                             isMe: false,
                             spaceLength: 4,
                             images: status.stories,
-                            uid: widget.uid),
+                            uid: widget.currentUser.uid),
                         child: Container(
                           margin: const EdgeInsets.all(3),
                           width: 55,
@@ -342,9 +334,9 @@ class _StatusPageState extends State<StatusPage> {
           caption: "This is very beautiful photo",
           onPageChanged: (index) {
             BlocProvider.of<StatusCubit>(context).seenStatusUpdate(
-                statusId: status!.statusId!,
+                statusId: status.statusId!,
                 imageIndex: index,
-                userId: widget.uid);
+                userId: widget.currentUser.uid!);
           },
           storyItems: stories,
           createdAt: status!.createdAt!.toDate(),
@@ -366,7 +358,10 @@ class _StatusPageState extends State<StatusPage> {
           ));
         }
 
-        di.sl<GetMyStatusFutureUseCase>().call(widget.uid).then((myStatus) {
+        di
+            .sl<GetMyStatusFutureUseCase>()
+            .call(widget.currentUser.uid!)
+            .then((myStatus) {
           if (myStatus.isNotEmpty) {
             BlocProvider.of<StatusCubit>(context)
                 .updateOnlyImageStatus(
@@ -377,7 +372,7 @@ class _StatusPageState extends State<StatusPage> {
                   context,
                   MaterialPageRoute(
                       builder: (_) => HomePage(
-                            uid: widget.uid,
+                            uid: widget.currentUser.uid!,
                             index: 1,
                           )));
             });
@@ -398,7 +393,7 @@ class _StatusPageState extends State<StatusPage> {
                   context,
                   MaterialPageRoute(
                       builder: (_) => HomePage(
-                            uid: widget.uid,
+                            uid: widget.currentUser.uid!,
                             index: 1,
                           )));
             });
