@@ -150,19 +150,25 @@ class StatusRemoteDataSourceImpl implements StatusRemoteDataSource {
         if (createdAt
             .isAfter(DateTime.now().subtract(const Duration(hours: 24)))) {
           //if it is, update the existing status with the new stories (images or videos)
-          final updatedStories =
+          final stories =
+              List<Map<String, dynamic>>.from(statusDocRef.get('stories'));
+          stories.addAll(
+              status.stories!.map((e) => StatusImageEntity.toJsonStatic(e)));
+          /* final updatedStories =
               List<StatusImageEntity>.from(existingStatusData['stories'])
-                ..addAll(status.stories!);
+                ..addAll(status.stories!); */
 
-          await statusCollection.doc(status.statusId).update(
-              {'stories': updatedStories, 'imageUrl': updatedStories[0].url});
+          await statusCollection.doc(status.statusId).update({
+            'stories': stories,
+            'imageUrl': stories[0]['url'],
+          });
           return;
         } else {
           return;
         }
       }
     } catch (e) {
-      print("Some error occur while update only image status");
+      print("Some error occur while update status stories");
     }
   }
 

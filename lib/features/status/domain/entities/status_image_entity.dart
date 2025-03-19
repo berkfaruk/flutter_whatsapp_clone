@@ -14,6 +14,14 @@ class StatusImageEntity extends Equatable {
         viewers: List.from(json['viewers']));
   }
 
+  static Map<String, dynamic> toJsonStatic(
+          StatusImageEntity statusImageEntity) =>
+      {
+        "url": statusImageEntity.url,
+        "type": statusImageEntity.type,
+        "viewers": statusImageEntity.viewers,
+      };
+
   Map<String, dynamic> toJson() => {
         "url": url,
         "type": type,
