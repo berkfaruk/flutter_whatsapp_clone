@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:whatsapp_clone_app/features/app/const/page_const.dart';
 import 'package:whatsapp_clone_app/features/app/global/widgets/show_image_and_video_widget.dart';
 import 'package:whatsapp_clone_app/features/app/theme/style.dart';
+import 'package:whatsapp_clone_app/features/call/presentation/cubit/my_call_history/my_call_history_cubit.dart';
 import 'package:whatsapp_clone_app/features/call/presentation/pages/calls_history_page.dart';
 import 'package:whatsapp_clone_app/features/chat/presentation/pages/chat_page.dart';
 import 'package:whatsapp_clone_app/features/status/domain/entities/status_entity.dart';
@@ -38,6 +39,8 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     BlocProvider.of<GetSingleUserCubit>(context).getSingleUser(uid: widget.uid);
+    BlocProvider.of<MyCallHistoryCubit>(context)
+        .getMyCallHistory(uid: widget.uid);
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 3, vsync: this);
 
@@ -216,7 +219,7 @@ class _HomePageState extends State<HomePage>
               StatusPage(
                 currentUser: currentUser,
               ),
-              const CallsHistoryPage(),
+              CallsHistoryPage(currentUser: currentUser),
             ]),
           );
         }
